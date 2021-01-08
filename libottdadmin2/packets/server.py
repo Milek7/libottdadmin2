@@ -474,3 +474,15 @@ class ServerRconEnd(AdminRcon):
 @Packet.register
 class ServerPong(AdminPing):
     packet_id = 126
+
+@Packet.register
+class ServerNeedKeyauth(Packet):
+    packet_id = 127
+    fields = ['challenge']
+
+    def encode(self, challenge):
+        assert len(challenge) == 16
+        self.write_bytes(challenge)
+
+    def decode(self):
+        return self.data(self.read_bytes(16))

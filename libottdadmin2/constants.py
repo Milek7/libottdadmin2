@@ -26,7 +26,6 @@ NETWORK_SERVER_ID_LENGTH = 33  # The maximum length of the network id of the ser
 # Note: NETWORK_REVISION_LENGTH has been increased to 33. Set to the 15 to maintain compat with older versions
 NETWORK_REVISION_LENGTH = 33  # The maximum length of the revision, in bytes including '\0'
 
-NETWORK_PASSWORD_LENGTH = 33  # The maximum length of the password, in bytes including '\0'
 NETWORK_CLIENTS_LENGTH = 200  # The maximum length for the list of clients that controls a company, including '\0'
 NETWORK_CLIENT_NAME_LENGTH = 25  # The maximum length of a client's name, in bytes including '\0'
 NETWORK_RCONCOMMAND_LENGTH = 500  # The maximum length of a rconsole command, in bytes including '\0'

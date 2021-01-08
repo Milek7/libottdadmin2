@@ -7,7 +7,7 @@
 import json
 from typing import Tuple, Union
 
-from libottdadmin2.constants import NETWORK_CLIENT_NAME_LENGTH, NETWORK_REVISION_LENGTH, NETWORK_PASSWORD_LENGTH, \
+from libottdadmin2.constants import NETWORK_CLIENT_NAME_LENGTH, NETWORK_REVISION_LENGTH, \
     NETWORK_CHAT_LENGTH, NETWORK_RCONCOMMAND_LENGTH, NETWORK_GAMESCRIPT_JSON_LENGTH
 from libottdadmin2.packets.base import Packet, check_length
 from libottdadmin2.enums import UpdateType, UpdateFrequency, ChatAction, DestType, PollExtra
@@ -16,18 +16,30 @@ from libottdadmin2.enums import UpdateType, UpdateFrequency, ChatAction, DestTyp
 @Packet.register
 class AdminJoin(Packet):
     packet_id = 0
-    fields = ['password', 'name', 'version']
+    fields = ['name', 'version']
 
-    def encode(self, password: str, name: str, version: str):
-        self.write_str(check_length(password, NETWORK_PASSWORD_LENGTH, "'password'"),
-                       check_length(name, NETWORK_CLIENT_NAME_LENGTH, "'name'"),
+    def encode(self, name: str, version: str):
+        self.write_str(check_length(name, NETWORK_CLIENT_NAME_LENGTH, "'name'"),
                        check_length(version, NETWORK_REVISION_LENGTH, "'version'"))
 
-    def decode(self) -> Tuple[str, str, str]:
-        password, name, version = self.read_str(3)
-        return self.data(check_length(password, NETWORK_PASSWORD_LENGTH, "'password'"),
-                         check_length(name, NETWORK_CLIENT_NAME_LENGTH, "'name'"),
+    def decode(self) -> Tuple[str, str]:
+        name, version = self.read_str(2)
+        return self.data(check_length(name, NETWORK_CLIENT_NAME_LENGTH, "'name'"),
                          check_length(version, NETWORK_REVISION_LENGTH, "'version'"))
+
+@Packet.register
+class AdminKeyauth(Packet):
+    packet_id = 8
+    fields = ['pubkey', 'signature']
+
+    def encode(self, pubkey, signature):
+        assert len(pubkey) == 32
+        assert len(signature) == 64
+        self.write_bytes(pubkey)
+        self.write_bytes(signature)
+
+    def decode(self) -> Tuple[bytearray, bytearray]:
+        return (self.read_bytes(32), self.read_bytes(64))
 
 
 @Packet.register

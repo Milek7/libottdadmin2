@@ -6,7 +6,7 @@
 
 from libottdadmin2.packets.base import Packet
 from libottdadmin2.packets.admin import AdminChat, AdminGamescript, AdminJoin, AdminPing, \
-    AdminPoll, AdminQuit, AdminRcon, AdminUpdateFrequency
+    AdminPoll, AdminQuit, AdminRcon, AdminUpdateFrequency, AdminKeyauth
 from libottdadmin2.packets.server import ServerFull, ServerBanned, ServerError, ServerProtocol, \
     ServerWelcome, ServerNewGame, ServerShutdown, ServerDate, \
     ServerClientJoin, ServerClientInfo, ServerClientUpdate, \
@@ -15,7 +15,7 @@ from libottdadmin2.packets.server import ServerFull, ServerBanned, ServerError, 
     ServerCompanyRemove, ServerCompanyEconomy, \
     ServerCompanyStats, ServerChat, ServerRcon, \
     ServerConsole, ServerCmdNames, ServerCmdLogging, \
-    ServerGamescript, ServerRconEnd, ServerPong
+    ServerGamescript, ServerRconEnd, ServerPong, ServerNeedKeyauth
 
 __all__ = [
     "Packet",
@@ -47,10 +47,12 @@ __all__ = [
     "ServerRconEnd",
     "ServerShutdown",
     "ServerWelcome",
+    "ServerNeedKeyauth",
 
     "AdminChat",
     "AdminGamescript",
     "AdminJoin",
+    "AdminKeyauth",
     "AdminPing",
     "AdminPoll",
     "AdminQuit",

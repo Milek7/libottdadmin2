@@ -16,7 +16,7 @@ from libottdadmin2.util import loggable
 @loggable
 class OttdAdminProtocol(OttdClientMixIn, asyncio.Protocol):
     # noinspection PyUnusedLocal
-    def __init__(self, loop, password: Optional[str] = None, user_agent: Optional[str] = None,
+    def __init__(self, loop, keypair = None, user_agent: Optional[str] = None,
                  version: Optional[str] = None, **kwargs):
         self.loop = loop
         self._buffer = b''
@@ -24,7 +24,7 @@ class OttdAdminProtocol(OttdClientMixIn, asyncio.Protocol):
         self.transport = None
         self.peername = None
 
-        self.configure(password=password, user_agent=user_agent, version=version)
+        self.configure(keypair=keypair, user_agent=user_agent, version=version)
 
     def _close(self):
         self.transport.close()

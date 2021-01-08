@@ -6,24 +6,25 @@
 
 from asyncio import transports
 from typing import Tuple, Any, Optional
+from pyhy import hydro_sign_create
 
-from libottdadmin2.packets import AdminJoin, Packet, AdminQuit
+from libottdadmin2.packets import AdminJoin, AdminKeyauth, Packet, AdminQuit
 from libottdadmin2.util import loggable, camel_to_snake
 
 
 @loggable
 class OttdClientMixIn:
     _buffer = None  # Type: bytes
-    _password = None  # Type: Optional[str]
+    _keypair = None
     _user_agent = None  # Type: Optional[str]
     _version = None  # Type: Optional[str]
     transport = None  # Type: Optional[transports.Transport]
     peername = None  # Type: Tuple[str, int]
 
-    def configure(self, password: Optional[str] = None, user_agent: Optional[str] = None,
+    def configure(self, keypair = None, user_agent: Optional[str] = None,
                   version: Optional[str] = None):
         from libottdadmin2 import VERSION
-        self._password = password
+        self._keypair = keypair
         self._user_agent = user_agent or "libottdadmin2"
         self._version = version or VERSION
 
@@ -34,9 +35,9 @@ class OttdClientMixIn:
 
         self.log.info("Connection made to %s:%d", self.peername[0], self.peername[1])
 
-        if self._password:
+        if self._keypair:
             self.log.info("Automatically authenticating: %s@%s", self._user_agent, self._version)
-            self.send_packet(AdminJoin.create(password=self._password, name=self._user_agent, version=self._version))
+            self.send_packet(AdminJoin.create(name=self._user_agent, version=self._version))
 
     def data_received(self, data: bytes) -> None:
         self._buffer += data
@@ -50,6 +51,11 @@ class OttdClientMixIn:
     def packet_received(self, packet: Packet, data: Tuple[Any, ...]) -> None:
         self.log.debug("Packet received: %r", data)
         func_name = camel_to_snake(packet.__class__.__name__)
+        if func_name == "server_need_keyauth":
+            challenge = data._asdict()['challenge'][0]
+            signature = hydro_sign_create(challenge, "KEY_AUTH", self._keypair.sk)
+            self.send_packet(AdminKeyauth.create(pubkey=self._keypair.pk, signature=signature))
+            return
         handler = getattr(self, "on_%s" % func_name, None)
         if handler and callable(handler):
             # noinspection PyProtectedMember,PyUnresolvedReferences

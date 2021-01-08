@@ -268,6 +268,11 @@ class Packet:
     def write_ulonglong(self, *values: int):
         self._write_simple('Q', *values)
 
+    def write_bytes(self, *values: bytearray):
+        self._write_process()
+        self._buffer += bytearray(values[0])
+        self._index += len(values[0])
+
     def write_str(self, *values: str):
         self._write_process()
         encoded = b'\x00'.join(map(ensure_binary, values)) + b'\x00'
@@ -337,6 +342,9 @@ class Packet:
 
     def read_str(self, amount: int = 1) -> Iterable[str]:
         return self._read_simple(str, amount)
+
+    def read_bytes(self, amount):
+        return self._read_simple('%ds' % amount, 1)
 
     def encode(self, **kwargs):
         pass
